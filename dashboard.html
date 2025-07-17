@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Administración</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+    }
+
+    nav {
+      background-color: #800020; /* vino oscuro */
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li {
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      margin-top: 30px;
+      margin-bottom: 60px;
+    }
+
+    h2, h3 {
+      color: #800020;
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    input, textarea, select {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #a52a2a;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #800020;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2dede;
+      color: #800020;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #800020;
+    }
+
+    form label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #800020;
+      color: white;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>Museo de Cera</h1>
+    <ul>
+      <li onclick="mostrarSeccion('salas')">Salas</li>
+      <li onclick="mostrarSeccion('obras')">Obras</li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <!-- Sección SALAS -->
+    <div id="seccion-salas" class="form-section active">
+      <h2>Registrar Sala</h2>
+      <form id="form-sala">
+        <input type="text" id="nombre-sala" placeholder="Nombre de la sala" required>
+        <textarea id="descripcion-sala" placeholder="Descripción" required></textarea>
+        <input type="text" id="imagen-sala" placeholder="URL de imagen">
+        <button type="submit">Guardar Sala</button>
+      </form>
+      <h3>Salas registradas</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Imagen</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-salas"></tbody>
+      </table>
+    </div>
+
+    <!-- Sección OBRAS -->
+    <div id="seccion-obras" class="form-section">
+      <h2>Registrar Obra</h2>
+      <form id="form-obra">
+        <input type="text" id="nombre-obra" placeholder="Nombre de la obra" required>
+        <textarea id="descripcion-obra" placeholder="Descripción" required></textarea>
+        <input type="text" id="imagen-obra" placeholder="URL de imagen">
+        <select id="select-sala" required>
+          <option value="">Selecciona una sala</option>
+        </select>
+        <button type="submit">Guardar Obra</button>
+      </form>
+      <h3>Obras registradas</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Imagen</th>
+            <th>Sala</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-obras"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" src="./dashboard.js"></script>
+
+  <!-- Modales -->
+  <div id="modal-editar-sala" class="modal">
+    <div class="modal-content">
+      <span id="cerrar-modal-editar-sala" class="close">&times;</span>
+      <h2>Editar Sala</h2>
+      <form id="form-editar-sala">
+        <label>Nombre:</label>
+        <input type="text" id="editar-nombre-sala" required>
+        <label>Descripción:</label>
+        <textarea id="editar-descripcion-sala" required></textarea>
+        <label>URL Imagen:</label>
+        <input type="text" id="editar-imagen-sala">
+        <button type="submit">Actualizar Sala</button>
+        <button type="button" id="btn-cancelar-edicion-sala">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-editar-obra" class="modal">
+    <div class="modal-content">
+      <span id="cerrar-modal-editar-obra" class="close">&times;</span>
+      <h2>Editar Obra</h2>
+      <form id="form-editar-obra">
+        <label>Nombre:</label>
+        <input type="text" id="editar-nombre-obra" required>
+        <label>Descripción:</label>
+        <textarea id="editar-descripcion-obra" required></textarea>
+        <label>Imagen:</label>
+        <input type="text" id="editar-imagen-obra">
+        <label>Sala:</label>
+        <select id="editar-sala-obra" required></select>
+        <button type="submit">Actualizar Obra</button>
+        <button type="button" id="btn-cancelar-edicion-obra">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pie de página -->
+  <footer>
+    &copy; 2025 Museo de Cera - Panel de Administración
+  </footer>
+</body>
+</html>
+
